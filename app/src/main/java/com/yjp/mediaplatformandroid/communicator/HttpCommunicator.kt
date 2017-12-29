@@ -50,7 +50,6 @@ class HttpCommunicator(private val mContext: Context) {
             .connectTimeout(TIMEOUT_SECONDS.toLong(), TimeUnit.SECONDS)
             .build()
 
-    //异步GET请求
     fun getAsync(url: String, params: Map<String, String>?) {
 
         if (!CommonTools.isNetworkReachable(mContext)) {
@@ -58,7 +57,6 @@ class HttpCommunicator(private val mContext: Context) {
             return
         }
 
-        //构建请求URL
         val sb = StringBuilder()
         sb.append(url)
         if (params != null && !params.isEmpty()) {
@@ -71,12 +69,10 @@ class HttpCommunicator(private val mContext: Context) {
             }
         }
 
-        //创建一个Request
         val request = Request.Builder()
                 .url(sb.substring(0, sb.length - 1))
                 .build()
 
-        //请求加入调度
         val call = mOkHttpClient.newCall(request)
         call.enqueue(mCallback)
     }
@@ -88,13 +84,11 @@ class HttpCommunicator(private val mContext: Context) {
             return
         }
 
-        //创建一个Request
         val request = Request.Builder()
                 .url(url)
                 .post(RequestBody.create(mediaType, postBody))
                 .build()
 
-        //请求加入调度
         val call = mOkHttpClient.newCall(request)
         call.enqueue(mCallback)
     }
