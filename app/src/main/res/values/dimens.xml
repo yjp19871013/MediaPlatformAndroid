@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="login_toolbar_height">150dp</dimen>
+    <dimen name="login_form_margin">20dp</dimen>
+    <dimen name="login_button_width">250dp</dimen>
+    <dimen name="margin">10dp</dimen>
+    <dimen name="card_view_corner_radius">10dp</dimen>
+    <dimen name="login_form_title_margin_top">30dp</dimen>
+    <dimen name="login_form_title_text_size">20sp</dimen>
+    <dimen name="login_form_login_button_margin_top">20dp</dimen>
+</resources>

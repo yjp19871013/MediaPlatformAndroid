@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context="com.yjp.mediaplatformandroid.activities.LoginActivity">
+
+    <data>
+        <import type="com.yjp.mediaplatformandroid.dto.LoginForm" />
+        <variable
+            name="loginForm"
+            type="LoginForm" />
+    </data>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_margin="@dimen/login_form_margin"
+        android:orientation="vertical">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:layout_marginTop="@dimen/login_form_title_margin_top"
+            android:textSize="@dimen/login_form_title_text_size"
+            android:textStyle="bold"
+            android:text="@string/login_form_title_text"/>
+
+        <android.support.design.widget.TextInputLayout
+            android:id="@+id/uidInputLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <android.support.design.widget.TextInputEditText
+                android:id="@+id/usernameEditText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@={loginForm.username}"
+                android:hint="@string/username" />
+        </android.support.design.widget.TextInputLayout>
+
+        <android.support.design.widget.TextInputLayout
+            android:id="@+id/passwordInputLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <android.support.design.widget.TextInputEditText
+                android:id="@+id/passwordEditText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="textPassword"
+                android:text="@={loginForm.password}"
+                android:hint="@string/password" />
+        </android.support.design.widget.TextInputLayout>
+
+        <Button
+            android:id="@+id/loginButton"
+            android:layout_width="@dimen/login_button_width"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginTop="@dimen/login_form_login_button_margin_top"
+            android:text="@string/login" />
+
+    </LinearLayout>
+</layout>
+
