@@ -50,7 +50,7 @@ class HttpCommunicator(private val mContext: Context) {
             .connectTimeout(TIMEOUT_SECONDS.toLong(), TimeUnit.SECONDS)
             .build()
 
-    fun getAsync(url: String, params: Map<String, String>?) {
+    fun getAsync(url: String, params: Map<String, String>? = null) {
 
         if (!CommonTools.isNetworkReachable(mContext)) {
             EventBus.getDefault().post(HttpEvent(url, false, ERROR_NETWORK_NOT_REACHABLE))
@@ -94,6 +94,8 @@ class HttpCommunicator(private val mContext: Context) {
     }
 
     companion object {
+        val MEDIA_TYPE_JSON = MediaType.parse("application/json; charset=utf-8")
+
         val ERROR_COMMON = "请求失败"
         val ERROR_TIMEOUT = "请求超时"
         val ERROR_NETWORK_NOT_REACHABLE = "网络未连接"
