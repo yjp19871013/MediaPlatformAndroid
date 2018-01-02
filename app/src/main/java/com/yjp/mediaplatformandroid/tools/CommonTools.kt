@@ -3,6 +3,7 @@ package com.yjp.mediaplatformandroid.tools
 import android.content.Context
 import android.net.NetworkInfo
 import android.net.ConnectivityManager
+import com.google.gson.Gson
 
 
 object CommonTools {

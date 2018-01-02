@@ -1,6 +1,7 @@
 package com.yjp.mediaplatformandroid.communicator
 
 import android.content.Context
+import android.util.Log
 import com.yjp.mediaplatformandroid.tools.CommonTools
 
 import java.io.IOException
@@ -77,7 +78,7 @@ class HttpCommunicator(private val mContext: Context) {
         call.enqueue(mCallback)
     }
 
-    fun PostAsync(url: String, postBody: String, mediaType: MediaType) {
+    fun postAsync(url: String, postBody: String, mediaType: MediaType) {
 
         if (!CommonTools.isNetworkReachable(mContext)) {
             EventBus.getDefault().post(HttpEvent(url, false, ERROR_NETWORK_NOT_REACHABLE))
@@ -94,7 +95,7 @@ class HttpCommunicator(private val mContext: Context) {
     }
 
     companion object {
-        val MEDIA_TYPE_JSON = MediaType.parse("application/json; charset=utf-8")
+        val MEDIA_TYPE_JSON = MediaType.parse("application/json; charset=utf-8")!!
 
         val ERROR_COMMON = "请求失败"
         val ERROR_TIMEOUT = "请求超时"
