@@ -9,8 +9,8 @@ import com.yjp.mediaplatformandroid.R
 import com.yjp.mediaplatformandroid.communicator.HttpCommunicator
 import com.yjp.mediaplatformandroid.databinding.ActivityLoginBinding
 import com.yjp.mediaplatformandroid.dialogs.WaitDialog
-import com.yjp.mediaplatformandroid.dto.LoginForm
-import com.yjp.mediaplatformandroid.dto.LoginFormResponse
+import com.yjp.mediaplatformandroid.entities.LoginForm
+import com.yjp.mediaplatformandroid.entities.LoginFormResponse
 import com.yjp.mediaplatformandroid.global.MyApplication
 import com.yjp.mediaplatformandroid.global.URLTable
 import kotlinx.android.synthetic.main.activity_login.*

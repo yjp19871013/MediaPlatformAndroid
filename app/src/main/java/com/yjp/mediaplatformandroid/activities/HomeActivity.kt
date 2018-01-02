@@ -8,7 +8,7 @@ import android.widget.Toast
 import com.yjp.mediaplatformandroid.R
 import com.yjp.mediaplatformandroid.adapter.HomeAdapter
 import com.yjp.mediaplatformandroid.communicator.HttpCommunicator
-import com.yjp.mediaplatformandroid.dto.LogoutForm
+import com.yjp.mediaplatformandroid.entities.LogoutForm
 import com.yjp.mediaplatformandroid.global.MyApplication
 import com.yjp.mediaplatformandroid.global.URLTable
 import kotlinx.android.synthetic.main.activity_home.*

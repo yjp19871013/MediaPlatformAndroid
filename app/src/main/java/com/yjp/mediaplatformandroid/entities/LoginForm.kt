@@ -1,4 +1,4 @@
-package com.yjp.mediaplatformandroid.dto
+package com.yjp.mediaplatformandroid.entities
 
 data class LoginForm(var username: String = "", var password: String = "")
 

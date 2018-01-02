@@ -4,10 +4,10 @@
     tools:context="com.yjp.mediaplatformandroid.activities.LoginActivity">
 
     <data>
-        <import type="com.yjp.mediaplatformandroid.dto.LoginForm" />
+        <import type="com.yjp.mediaplatformandroid.entities.LoginForm" />
         <variable
             name="loginForm"
-            type="LoginForm" />
+            type="com.yjp.mediaplatformandroid.entities.LoginForm" />
     </data>
 
     <LinearLayout
