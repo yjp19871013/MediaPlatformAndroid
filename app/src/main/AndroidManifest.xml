@@ -26,7 +26,7 @@
             </intent-filter>
         </activity>
         <activity android:name=".activities.HomeActivity" />
-        <activity android:name=".activities.ContactsActivity"></activity>
+        <activity android:name=".activities.RemoteContactsActivity"></activity>
     </application>
 
 </manifest>

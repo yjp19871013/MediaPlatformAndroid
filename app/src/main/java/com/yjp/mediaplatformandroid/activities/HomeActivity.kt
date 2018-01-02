@@ -21,7 +21,7 @@ class HomeActivity : AppCompatActivity() {
     companion object {
         private val ITEM_TITLES = arrayListOf("通讯录", "敬请期待")
         private val ITEM_ACTIVITY_MAP = mapOf(
-                "通讯录" to ContactsActivity::class.java,
+                "通讯录" to RemoteContactsActivity::class.java,
                 "敬请期待" to null
         )
     }
