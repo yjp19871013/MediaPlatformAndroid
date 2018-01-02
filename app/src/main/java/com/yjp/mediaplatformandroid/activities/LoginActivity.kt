@@ -8,6 +8,7 @@ import android.widget.Toast
 import com.yjp.mediaplatformandroid.R
 import com.yjp.mediaplatformandroid.communicator.HttpCommunicator
 import com.yjp.mediaplatformandroid.databinding.ActivityLoginBinding
+import com.yjp.mediaplatformandroid.dialogs.WaitDialog
 import com.yjp.mediaplatformandroid.dto.LoginForm
 import com.yjp.mediaplatformandroid.dto.LoginFormResponse
 import com.yjp.mediaplatformandroid.global.MyApplication
@@ -46,13 +47,21 @@ class LoginActivity : AppCompatActivity() {
         EventBus.getDefault().unregister(this)
     }
 
+    override fun onPause() {
+        super.onPause()
+        WaitDialog.dismissWaitDialog()
+    }
+
     private fun doLogin() {
+        WaitDialog.showWaitDialog(this, "正在登录")
         val jsonLoginForm = MyApplication.GSON.toJson(loginForm, LoginForm::class.java)
         communicator!!.postAsync(URLTable.LOGIN, jsonLoginForm, HttpCommunicator.MEDIA_TYPE_JSON)
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     fun loginComplete(event: HttpCommunicator.HttpEvent) {
+        WaitDialog.dismissWaitDialog()
+
         if (URLTable.LOGIN != event.url) {
             return
         }

@@ -1,10 +1,3 @@
-/**
- * 名称: DataBindingAdapter.kt <br></br>
- * 描述: 使用DataBinding的抽象Adapter <br></br>
- * 创建人: 尹嘉鹏 <br></br>
- * 版本: 1.0 <br></br>
- * 创建时间: 2017年6月26日 上午10:00
- */
 package com.yjp.mediaplatformandroid.adapter
 
 import android.content.Context
