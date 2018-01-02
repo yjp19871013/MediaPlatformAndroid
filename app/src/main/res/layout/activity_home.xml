@@ -1,22 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.yjp.mediaplatformandroid.activities.HomeActivity"
-    android:orientation="vertical">
+    android:layout_margin="@dimen/margin"
+    tools:context="com.yjp.mediaplatformandroid.activities.HomeActivity">
 
-    <Button
-        android:id="@+id/logoutButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="注销"/>
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/recyclerView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
 
-    <Button
-        android:id="@+id/queryButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="获取数据"/>
-
-</LinearLayout>
+</FrameLayout>
