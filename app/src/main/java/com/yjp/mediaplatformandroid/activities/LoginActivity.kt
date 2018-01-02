@@ -1,5 +1,6 @@
 package com.yjp.mediaplatformandroid.activities
 
+import android.content.Intent
 import android.databinding.DataBindingUtil
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
@@ -19,7 +20,7 @@ import org.greenrobot.eventbus.ThreadMode
 class LoginActivity : AppCompatActivity() {
 
     private var mDataBinding: ActivityLoginBinding? = null
-    private var loginForm =  LoginForm()
+    private var loginForm = LoginForm()
     private var communicator: HttpCommunicator? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -62,6 +63,13 @@ class LoginActivity : AppCompatActivity() {
         }
 
         val loginFormResponse = MyApplication.GSON.fromJson(event.data, LoginFormResponse::class.java)
-        // TODO
+        if (!loginFormResponse.error.isEmpty()) {
+            Toast.makeText(this, loginFormResponse.error, Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        MyApplication.loginFormResponse = loginFormResponse
+        val intent = Intent(this, HomeActivity::class.java)
+        startActivity(intent)
     }
 }

@@ -1,7 +1,6 @@
 package com.yjp.mediaplatformandroid.communicator
 
 import android.content.Context
-import android.util.Log
 import com.yjp.mediaplatformandroid.tools.CommonTools
 
 import java.io.IOException
@@ -58,9 +57,10 @@ class HttpCommunicator(private val mContext: Context) {
             return
         }
 
-        val sb = StringBuilder()
-        sb.append(url)
+        var requestUrl = url
         if (params != null && !params.isEmpty()) {
+            val sb = StringBuilder()
+            sb.append(requestUrl)
             sb.append("?")
             for ((key, value) in params) {
                 sb.append(key)
@@ -68,10 +68,11 @@ class HttpCommunicator(private val mContext: Context) {
                 sb.append(value)
                 sb.append("&")
             }
+            requestUrl = sb.substring(0, sb.length - 1)
         }
 
         val request = Request.Builder()
-                .url(sb.substring(0, sb.length - 1))
+                .url(requestUrl)
                 .build()
 
         val call = mOkHttpClient.newCall(request)
