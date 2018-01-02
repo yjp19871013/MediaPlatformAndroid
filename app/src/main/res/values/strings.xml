@@ -7,4 +7,5 @@
     <string name="password_should_not_empty">密码不能为空</string>
     <string name="login_success">登陆成功</string>
     <string name="login_form_title_text">欢迎使用系统</string>
+    <string name="remote_contacts_activity_label">远程通信录</string>
 </resources>
