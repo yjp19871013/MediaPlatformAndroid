@@ -23,7 +23,7 @@ class RemoteContactsDetailsActivity : AppCompatActivity() {
                         this, R.layout.activity_remote_contacts_details)
 
         val name = intent.getStringExtra(NAME_INTENT)
-        dataBinding.title = "${name} 号码列表"
+        dataBinding.title = "$name 号码列表"
 
         val phoneNumbers = intent.getStringArrayListExtra(PHONE_NUMBERS_INTENT)
         val adapter = ArrayAdapter(this, android.R.layout.simple_list_item_1, phoneNumbers)
