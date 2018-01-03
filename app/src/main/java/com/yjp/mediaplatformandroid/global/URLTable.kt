@@ -9,4 +9,6 @@ object URLTable {
     val LOGOUT = HOST + "mediaplatform_login/api_logout/"
 
     val CONTACTS_USER_DETAILS_FORMAT = HOST + "mediaplatform/api_contacts_user_details/%s/"
+
+    val CONTACTS_UPDATE = HOST + "mediaplatform/api_contacts_update/"
 }

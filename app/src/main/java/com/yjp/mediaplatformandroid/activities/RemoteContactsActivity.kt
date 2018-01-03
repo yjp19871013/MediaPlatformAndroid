@@ -118,7 +118,7 @@ class RemoteContactsActivity : AppCompatActivity() {
                         ))
                     }
                 }
-        clearData()
+
         mAdapter!!.notifyDataSetChanged()
     }
 }
