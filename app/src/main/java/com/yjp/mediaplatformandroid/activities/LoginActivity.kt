@@ -66,7 +66,7 @@ class LoginActivity : AppCompatActivity() {
             return
         }
 
-        if (event.success == false) {
+        if (!event.success) {
             Toast.makeText(this, event.data, Toast.LENGTH_SHORT).show()
             return
         }
