@@ -10,7 +10,9 @@ import android.widget.Toast
 import com.yjp.mediaplatformandroid.R
 import com.yjp.mediaplatformandroid.communicator.HttpCommunicator
 import com.yjp.mediaplatformandroid.dialogs.WaitDialog
-import com.yjp.mediaplatformandroid.entities.RemoteContactResponse
+import com.yjp.mediaplatformandroid.entities.RemoteContact
+import com.yjp.mediaplatformandroid.entities.RemoteContactQueryResponse
+import com.yjp.mediaplatformandroid.entities.RemoteContactUpdateResponse
 import com.yjp.mediaplatformandroid.global.MyApplication
 import com.yjp.mediaplatformandroid.global.URLTable
 import kotlinx.android.synthetic.main.activity_remote_contacts.*
@@ -55,7 +57,7 @@ class RemoteContactsActivity : AppCompatActivity() {
 
         listView.emptyView = emptyView
         startBackupButton.setOnClickListener {
-
+            doBackUp()
         }
 
         communicator = HttpCommunicator(this)
@@ -96,6 +98,39 @@ class RemoteContactsActivity : AppCompatActivity() {
         data.clear()
     }
 
+    private fun doBackUp() {
+        val user_id = MyApplication.loginFormResponse!!.id
+        val contact1 = RemoteContact(userId = user_id, name = "yjp", phoneNumber = "123456789")
+        val contact2 = RemoteContact(userId = user_id, name = "yjp", phoneNumber = "012345678")
+        val contact3 = RemoteContact(userId = user_id, name = "yjp1", phoneNumber = "123456789")
+        val contact4 = RemoteContact(userId = user_id, name = "yjp2", phoneNumber = "123456789")
+        val contacts = arrayListOf(contact1, contact2, contact3, contact4)
+
+        WaitDialog.showWaitDialog(this, "正在备份")
+        val json = MyApplication.GSON.toJson(contacts)
+        communicator!!.postAsync(URLTable.CONTACTS_UPDATE, json, HttpCommunicator.MEDIA_TYPE_JSON)
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    fun backupComplete(event: HttpCommunicator.HttpEvent) {
+        WaitDialog.dismissWaitDialog()
+
+        if (URLTable.CONTACTS_UPDATE != event.url) {
+            return
+        }
+
+        if (!event.success) {
+            Toast.makeText(this, "备份失败", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        val response = MyApplication.GSON.fromJson(event.data, RemoteContactUpdateResponse::class.java)
+        if (!response.error.isEmpty()) {
+            Toast.makeText(this, response.error, Toast.LENGTH_SHORT).show()
+            return
+        }
+    }
+
     @Subscribe(threadMode = ThreadMode.MAIN)
     fun loadDataComplete(event: HttpCommunicator.HttpEvent) {
         WaitDialog.dismissWaitDialog()
@@ -109,7 +144,7 @@ class RemoteContactsActivity : AppCompatActivity() {
             return
         }
 
-        val response = MyApplication.GSON.fromJson(event.data, RemoteContactResponse::class.java)
+        val response = MyApplication.GSON.fromJson(event.data, RemoteContactQueryResponse::class.java)
         if (!response.error.isEmpty()) {
             Toast.makeText(this, response.error, Toast.LENGTH_SHORT).show()
             return
