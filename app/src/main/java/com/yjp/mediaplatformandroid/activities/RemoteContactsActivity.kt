@@ -26,7 +26,7 @@ class RemoteContactsActivity : AppCompatActivity() {
     private var dataKeys = arrayOf("name", "first_phone_num")
     private var data = mutableListOf<Map<String, String>>()
     private var communicator: HttpCommunicator? = null
-    private var phoneNumberMap = mutableMapOf<String, MutableList<String>>()
+    private var phoneNumberMap = mutableMapOf<String, ArrayList<String>>()
 
     private val dataQueryUrl =
             URLTable.CONTACTS_USER_DETAILS_FORMAT.format(MyApplication.loginFormResponse!!.id)
@@ -41,13 +41,23 @@ class RemoteContactsActivity : AppCompatActivity() {
                 dataKeys,
                 intArrayOf(android.R.id.text1, android.R.id.text2))
         listView.adapter = mAdapter
+
         listView.setOnItemClickListener {
             adapterView, view, postion, id ->
             val intent = Intent(this@RemoteContactsActivity,
                     RemoteContactsDetailsActivity::class.java)
+            val name = data[postion][dataKeys[0]]
+            val phoneNumbers = phoneNumberMap[name]
+            intent.putExtra(RemoteContactsDetailsActivity.NAME_INTENT, name)
+            intent.putStringArrayListExtra(
+                    RemoteContactsDetailsActivity.PHONE_NUMBERS_INTENT, phoneNumbers)
             startActivity(intent)
         }
+
         listView.emptyView = emptyView
+        startBackupButton.setOnClickListener {
+
+        }
 
         communicator = HttpCommunicator(this)
     }
@@ -111,7 +121,7 @@ class RemoteContactsActivity : AppCompatActivity() {
                     if (phoneNumberMap.containsKey(name)) {
                         phoneNumberMap[name]!!.add(phoneNumber)
                     } else {
-                        phoneNumberMap.put(name, mutableListOf(phoneNumber))
+                        phoneNumberMap.put(name, arrayListOf(phoneNumber))
                         data.add(mapOf(
                                 dataKeys[0] to name,
                                 dataKeys[1] to phoneNumber

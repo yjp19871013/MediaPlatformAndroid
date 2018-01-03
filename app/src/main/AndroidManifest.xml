@@ -29,7 +29,8 @@
         <activity
             android:name=".activities.RemoteContactsActivity"
             android:label="@string/remote_contacts_activity_label" />
-        <activity android:name=".activities.RemoteContactsDetailsActivity"></activity>
+        <activity android:name=".activities.RemoteContactsDetailsActivity"
+            android:label="号码详情" />
     </application>
 
 </manifest>
