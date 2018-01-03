@@ -10,10 +10,9 @@ import android.widget.Toast
 import com.yjp.mediaplatformandroid.R
 import com.yjp.mediaplatformandroid.communicator.HttpCommunicator
 import com.yjp.mediaplatformandroid.dialogs.WaitDialog
-import com.yjp.mediaplatformandroid.entities.RemoteContact
+import com.yjp.mediaplatformandroid.entities.RemoteContactResponse
 import com.yjp.mediaplatformandroid.global.MyApplication
 import com.yjp.mediaplatformandroid.global.URLTable
-import com.yjp.mediaplatformandroid.global.jsonToArrayList
 import kotlinx.android.synthetic.main.activity_remote_contacts.*
 import org.greenrobot.eventbus.EventBus
 import org.greenrobot.eventbus.Subscribe
@@ -43,7 +42,7 @@ class RemoteContactsActivity : AppCompatActivity() {
         listView.adapter = mAdapter
 
         listView.setOnItemClickListener {
-            adapterView, view, postion, id ->
+            _,  _, postion,  _ ->
             val intent = Intent(this@RemoteContactsActivity,
                     RemoteContactsDetailsActivity::class.java)
             val name = data[postion][dataKeys[0]]
@@ -110,8 +109,15 @@ class RemoteContactsActivity : AppCompatActivity() {
             return
         }
 
+        val response = MyApplication.GSON.fromJson(event.data, RemoteContactResponse::class.java)
+        if (!response.error.isEmpty()) {
+            Toast.makeText(this, response.error, Toast.LENGTH_SHORT).show()
+            return
+        }
+
         clearData()
-        val remoteContacts = MyApplication.GSON.jsonToArrayList(event.data, RemoteContact::class.java)
+
+        val remoteContacts = response.data
         remoteContacts
                 .sortedBy { it.name }
                 .forEach {
