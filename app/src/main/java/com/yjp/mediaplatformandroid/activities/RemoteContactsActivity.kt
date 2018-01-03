@@ -1,7 +1,9 @@
 package com.yjp.mediaplatformandroid.activities
 
+import android.content.DialogInterface
 import android.content.Intent
 import android.os.Bundle
+import android.support.v7.app.AlertDialog
 import android.support.v7.app.AppCompatActivity
 import android.view.Menu
 import android.view.MenuItem
@@ -82,6 +84,7 @@ class RemoteContactsActivity : AppCompatActivity() {
 
     override fun onOptionsItemSelected(item: MenuItem?): Boolean {
         when (item?.itemId) {
+            R.id.backup -> doBackUp()
             R.id.refresh -> loadData()
             else -> throw RuntimeException("Should not come here.")
         }
@@ -99,6 +102,20 @@ class RemoteContactsActivity : AppCompatActivity() {
     }
 
     private fun doBackUp() {
+        AlertDialog.Builder(this)
+                .setTitle("提示")
+                .setMessage("本操作会将您本地通信录中的手机号码上传到服务器，确定进行操作?")
+                .setCancelable(false)
+                .setPositiveButton("确定",
+                        DialogInterface.OnClickListener {
+                            _, _ ->
+                            uploadData()
+                        })
+                .setNegativeButton("取消", null)
+                .show()
+    }
+
+    private fun uploadData() {
         val user_id = MyApplication.loginFormResponse!!.id
         val contact1 = RemoteContact(userId = user_id, name = "yjp", phoneNumber = "123456789")
         val contact2 = RemoteContact(userId = user_id, name = "yjp", phoneNumber = "012345678")
@@ -129,6 +146,8 @@ class RemoteContactsActivity : AppCompatActivity() {
             Toast.makeText(this, response.error, Toast.LENGTH_SHORT).show()
             return
         }
+
+        loadData()
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
