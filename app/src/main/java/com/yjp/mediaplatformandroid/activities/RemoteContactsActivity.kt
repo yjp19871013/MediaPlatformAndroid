@@ -14,7 +14,7 @@ import com.yjp.mediaplatformandroid.entities.RemoteContact
 import com.yjp.mediaplatformandroid.global.MyApplication
 import com.yjp.mediaplatformandroid.global.URLTable
 import com.yjp.mediaplatformandroid.global.jsonToArrayList
-import kotlinx.android.synthetic.main.activity_listview.*
+import kotlinx.android.synthetic.main.activity_remote_contacts.*
 import org.greenrobot.eventbus.EventBus
 import org.greenrobot.eventbus.Subscribe
 import org.greenrobot.eventbus.ThreadMode
@@ -33,7 +33,7 @@ class RemoteContactsActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_listview)
+        setContentView(R.layout.activity_remote_contacts)
 
         mAdapter = SimpleAdapter(this,
                 data,
@@ -47,6 +47,7 @@ class RemoteContactsActivity : AppCompatActivity() {
                     RemoteContactsDetailsActivity::class.java)
             startActivity(intent)
         }
+        listView.emptyView = emptyView
 
         communicator = HttpCommunicator(this)
     }
@@ -117,6 +118,7 @@ class RemoteContactsActivity : AppCompatActivity() {
                         ))
                     }
                 }
+        clearData()
         mAdapter!!.notifyDataSetChanged()
     }
 }
