@@ -1,5 +1,6 @@
 package com.yjp.mediaplatformandroid.activities
 
+import android.content.Intent
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.view.Menu
@@ -40,6 +41,12 @@ class RemoteContactsActivity : AppCompatActivity() {
                 dataKeys,
                 intArrayOf(android.R.id.text1, android.R.id.text2))
         listView.adapter = mAdapter
+        listView.setOnItemClickListener {
+            adapterView, view, postion, id ->
+            val intent = Intent(this@RemoteContactsActivity,
+                    RemoteContactsDetailsActivity::class.java)
+            startActivity(intent)
+        }
 
         communicator = HttpCommunicator(this)
     }
