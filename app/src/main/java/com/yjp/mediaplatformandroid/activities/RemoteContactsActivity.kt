@@ -17,6 +17,7 @@ import com.yjp.mediaplatformandroid.entities.RemoteContactQueryResponse
 import com.yjp.mediaplatformandroid.entities.RemoteContactUpdateResponse
 import com.yjp.mediaplatformandroid.global.MyApplication
 import com.yjp.mediaplatformandroid.global.URLTable
+import com.yjp.mediaplatformandroid.tools.LocalContactsTools
 import kotlinx.android.synthetic.main.activity_remote_contacts.*
 import org.greenrobot.eventbus.EventBus
 import org.greenrobot.eventbus.Subscribe
@@ -99,6 +100,7 @@ class RemoteContactsActivity : AppCompatActivity() {
     private fun clearData() {
         phoneNumberMap.clear()
         data.clear()
+        mAdapter!!.notifyDataSetChanged()
     }
 
     private fun doBackUp() {
@@ -106,24 +108,31 @@ class RemoteContactsActivity : AppCompatActivity() {
                 .setTitle("提示")
                 .setMessage("本操作会将您本地通信录中的手机号码上传到服务器，确定进行操作?")
                 .setCancelable(false)
-                .setPositiveButton("确定",
-                        DialogInterface.OnClickListener {
-                            _, _ ->
-                            uploadData()
-                        })
+                .setPositiveButton("确定") {
+                    _, _ ->
+                    uploadData()
+                }
                 .setNegativeButton("取消", null)
                 .show()
     }
 
     private fun uploadData() {
-        val user_id = MyApplication.loginFormResponse!!.id
-        val contact1 = RemoteContact(userId = user_id, name = "yjp", phoneNumber = "123456789")
-        val contact2 = RemoteContact(userId = user_id, name = "yjp", phoneNumber = "012345678")
-        val contact3 = RemoteContact(userId = user_id, name = "yjp1", phoneNumber = "123456789")
-        val contact4 = RemoteContact(userId = user_id, name = "yjp2", phoneNumber = "123456789")
-        val contacts = arrayListOf(contact1, contact2, contact3, contact4)
-
         WaitDialog.showWaitDialog(this, "正在备份")
+
+        val localContacts =
+                LocalContactsTools.queryContacts(this@RemoteContactsActivity)
+        val userId = MyApplication.loginFormResponse!!.id
+        val contacts = arrayListOf<RemoteContact>()
+
+        localContacts.keys.forEach {
+            val name = it
+            val phoneNumbers = localContacts[name]!!
+            phoneNumbers.forEach {
+                val contact = RemoteContact(userId = userId, name = name, phoneNumber = it)
+                contacts.add(contact)
+            }
+        }
+
         val json = MyApplication.GSON.toJson(contacts)
         communicator!!.postAsync(URLTable.CONTACTS_UPDATE, json, HttpCommunicator.MEDIA_TYPE_JSON)
     }
@@ -167,28 +176,28 @@ class RemoteContactsActivity : AppCompatActivity() {
         if (!response.error.isEmpty()) {
             Toast.makeText(this, response.error, Toast.LENGTH_SHORT).show()
             return
-        }
+        } else {
+            clearData()
 
-        clearData()
+            val remoteContacts = response.data
+            remoteContacts
+                    .sortedBy { it.name }
+                    .forEach {
+                        val name = it.name
+                        val phoneNumber = it.phoneNumber
 
-        val remoteContacts = response.data
-        remoteContacts
-                .sortedBy { it.name }
-                .forEach {
-                    val name = it.name
-                    val phoneNumber = it.phoneNumber
-
-                    if (phoneNumberMap.containsKey(name)) {
-                        phoneNumberMap[name]!!.add(phoneNumber)
-                    } else {
-                        phoneNumberMap.put(name, arrayListOf(phoneNumber))
-                        data.add(mapOf(
-                                dataKeys[0] to name,
-                                dataKeys[1] to phoneNumber
-                        ))
+                        if (phoneNumberMap.containsKey(name)) {
+                            phoneNumberMap[name]!!.add(phoneNumber)
+                        } else {
+                            phoneNumberMap.put(name, arrayListOf(phoneNumber))
+                            data.add(mapOf(
+                                    dataKeys[0] to name,
+                                    dataKeys[1] to phoneNumber
+                            ))
+                        }
                     }
-                }
 
-        mAdapter!!.notifyDataSetChanged()
+            mAdapter!!.notifyDataSetChanged()
+        }
     }
 }
