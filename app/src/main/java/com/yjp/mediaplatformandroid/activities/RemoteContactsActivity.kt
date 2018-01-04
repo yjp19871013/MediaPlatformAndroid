@@ -23,6 +23,7 @@ import org.greenrobot.eventbus.EventBus
 import org.greenrobot.eventbus.Subscribe
 import org.greenrobot.eventbus.ThreadMode
 import java.lang.RuntimeException
+import java.util.concurrent.Executors
 
 class RemoteContactsActivity : AppCompatActivity() {
 
@@ -31,6 +32,8 @@ class RemoteContactsActivity : AppCompatActivity() {
     private var data = mutableListOf<Map<String, String>>()
     private var communicator: HttpCommunicator? = null
     private var phoneNumberMap = mutableMapOf<String, ArrayList<String>>()
+
+    private val executorService = Executors.newSingleThreadExecutor()
 
     private val dataQueryUrl =
             URLTable.CONTACTS_USER_DETAILS_FORMAT.format(MyApplication.loginFormResponse!!.id)
@@ -76,6 +79,7 @@ class RemoteContactsActivity : AppCompatActivity() {
     override fun onStop() {
         super.onStop()
         EventBus.getDefault().unregister(this)
+        executorService.shutdownNow()
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
@@ -118,22 +122,12 @@ class RemoteContactsActivity : AppCompatActivity() {
 
     private fun uploadData() {
         WaitDialog.showWaitDialog(this, "正在备份")
+        executorService.execute(QueryContactsRunnable())
+    }
 
-        val localContacts =
-                LocalContactsTools.queryContacts(this@RemoteContactsActivity)
-        val userId = MyApplication.loginFormResponse!!.id
-        val contacts = arrayListOf<RemoteContact>()
-
-        localContacts.keys.forEach {
-            val name = it
-            val phoneNumbers = localContacts[name]!!
-            phoneNumbers.forEach {
-                val contact = RemoteContact(userId = userId, name = name, phoneNumber = it)
-                contacts.add(contact)
-            }
-        }
-
-        val json = MyApplication.GSON.toJson(contacts)
+    @Subscribe
+    fun queryContactsComplete(event: QueryContactsRunnable.QueryContactsEvent) {
+        val json = MyApplication.GSON.toJson(event.contacts)
         communicator!!.postAsync(URLTable.CONTACTS_UPDATE, json, HttpCommunicator.MEDIA_TYPE_JSON)
     }
 
@@ -198,6 +192,28 @@ class RemoteContactsActivity : AppCompatActivity() {
                     }
 
             mAdapter!!.notifyDataSetChanged()
+        }
+    }
+
+    inner class QueryContactsRunnable: Runnable {
+        inner class QueryContactsEvent(val contacts: ArrayList<RemoteContact>)
+
+        override fun run() {
+            val localContacts =
+                    LocalContactsTools.queryContacts(this@RemoteContactsActivity)
+            val userId = MyApplication.loginFormResponse!!.id
+            val contacts = arrayListOf<RemoteContact>()
+
+            localContacts.keys.forEach {
+                name ->
+                val phoneNumbers = localContacts[name]!!
+                phoneNumbers.forEach {
+                    val contact = RemoteContact(userId = userId, name = name, phoneNumber = it)
+                    contacts.add(contact)
+                }
+            }
+
+            EventBus.getDefault().post(QueryContactsEvent(contacts))
         }
     }
 }
