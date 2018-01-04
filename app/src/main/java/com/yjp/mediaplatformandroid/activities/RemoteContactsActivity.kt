@@ -173,22 +173,20 @@ class RemoteContactsActivity : AppCompatActivity() {
             clearData()
 
             val remoteContacts = response.data
-            remoteContacts
-                    .sortedBy { it.name }
-                    .forEach {
-                        val name = it.name
-                        val phoneNumber = it.phoneNumber
+            remoteContacts.forEach {
+                val name = it.name
+                val phoneNumber = it.phoneNumber
 
-                        if (phoneNumberMap.containsKey(name)) {
-                            phoneNumberMap[name]!!.add(phoneNumber)
-                        } else {
-                            phoneNumberMap.put(name, arrayListOf(phoneNumber))
-                            data.add(mapOf(
-                                    dataKeys[0] to name,
-                                    dataKeys[1] to phoneNumber
-                            ))
-                        }
-                    }
+                if (phoneNumberMap.containsKey(name)) {
+                    phoneNumberMap[name]!!.add(phoneNumber)
+                } else {
+                    phoneNumberMap.put(name, arrayListOf(phoneNumber))
+                    data.add(mapOf(
+                            dataKeys[0] to name,
+                            dataKeys[1] to phoneNumber
+                    ))
+                }
+            }
 
             mAdapter!!.notifyDataSetChanged()
         }
