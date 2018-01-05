@@ -12,3 +12,11 @@ data class RemoteContactQueryResponse(val data: List<RemoteContact>, val error: 
 
 data class RemoteContactUpdateResponse(val error: String = "")
 
+data class RemoteContactOperation(val id: String = "",
+                                  @SerializedName(value = "user_id") val userId: String = "",
+                                  val operation: String = "",
+                                  @SerializedName(value = "new_phone_number") val newPhoneNumber: String = "",
+                                  val contacts: RemoteContact)
+
+data class RemoteContactOperationResponse(val data: List<RemoteContactOperation>,
+                                          val error: String = "")

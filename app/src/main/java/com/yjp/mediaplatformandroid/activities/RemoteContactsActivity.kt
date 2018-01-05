@@ -11,9 +11,7 @@ import android.widget.Toast
 import com.yjp.mediaplatformandroid.R
 import com.yjp.mediaplatformandroid.communicator.HttpCommunicator
 import com.yjp.mediaplatformandroid.dialogs.WaitDialog
-import com.yjp.mediaplatformandroid.entities.RemoteContact
-import com.yjp.mediaplatformandroid.entities.RemoteContactQueryResponse
-import com.yjp.mediaplatformandroid.entities.RemoteContactUpdateResponse
+import com.yjp.mediaplatformandroid.entities.*
 import com.yjp.mediaplatformandroid.global.MyApplication
 import com.yjp.mediaplatformandroid.global.URLTable
 import com.yjp.mediaplatformandroid.tools.LocalContactsTools
@@ -36,6 +34,9 @@ class RemoteContactsActivity : AppCompatActivity() {
 
     private val dataQueryUrl =
             URLTable.CONTACTS_USER_DETAILS_FORMAT.format(MyApplication.loginFormResponse!!.id)
+
+    private val contactsOperationUrl =
+            URLTable.CONTACTS_OPERATION_FORMAT.format(MyApplication.loginFormResponse!!.id)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -88,6 +89,7 @@ class RemoteContactsActivity : AppCompatActivity() {
 
     override fun onOptionsItemSelected(item: MenuItem?): Boolean {
         when (item?.itemId) {
+            R.id.sync_remote -> doSyncRemote()
             R.id.backup -> doBackUp()
             R.id.refresh -> loadData()
             else -> throw RuntimeException("Should not come here.")
@@ -119,15 +121,55 @@ class RemoteContactsActivity : AppCompatActivity() {
                 .show()
     }
 
+    private fun doSyncRemote() {
+        AlertDialog.Builder(this)
+                .setTitle("提示")
+                .setMessage("本操作会将远程通讯录操作同步到本地，确定进行操作?")
+                .setCancelable(false)
+                .setPositiveButton("确定") {
+                    _, _ ->
+                    syncContacts()
+                }
+                .setNegativeButton("取消", null)
+                .show()
+    }
+
     private fun uploadData() {
         WaitDialog.showWaitDialog(this, "正在备份")
         executorService.execute(QueryContactsRunnable())
+    }
+
+    private fun syncContacts() {
+        WaitDialog.showWaitDialog(this, "正在同步")
+        communicator!!.getAsync(contactsOperationUrl)
     }
 
     @Subscribe
     fun queryContactsComplete(event: QueryContactsRunnable.QueryContactsEvent) {
         val json = MyApplication.GSON.toJson(event.contacts)
         communicator!!.postAsync(URLTable.CONTACTS_UPDATE, json, HttpCommunicator.MEDIA_TYPE_JSON)
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    fun contactsOperationGetComplete(event: HttpCommunicator.HttpEvent) {
+        WaitDialog.dismissWaitDialog()
+
+        if (contactsOperationUrl != event.url) {
+            return
+        }
+
+        if (!event.success) {
+            Toast.makeText(this, "同步失败", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        val response = MyApplication.GSON.fromJson(event.data, RemoteContactOperationResponse::class.java)
+        if (!response.error.isEmpty()) {
+            Toast.makeText(this, response.error, Toast.LENGTH_SHORT).show()
+            return
+        }
+
+
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)

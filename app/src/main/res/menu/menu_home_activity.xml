@@ -1,13 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item android:id="@+id/sync_remote"
+        android:title="@string/sync_remote"
+        android:icon="@drawable/ic_menu_download"
+        app:showAsAction="ifRoom" />
+
     <item android:id="@+id/backup"
         android:title="@string/backup"
         android:icon="@android:drawable/ic_menu_upload"
-        app:showAsAction="always" />
+        app:showAsAction="ifRoom" />
 
     <item android:id="@+id/refresh"
         android:title="@string/refresh"
         android:icon="@android:drawable/ic_menu_rotate"
-        app:showAsAction="always" />
+        app:showAsAction="ifRoom" />
 </menu>

@@ -11,4 +11,6 @@ object URLTable {
     val CONTACTS_USER_DETAILS_FORMAT = HOST + "mediaplatform/api_contacts_user_details/%s/"
 
     val CONTACTS_UPDATE = HOST + "mediaplatform/api_contacts_update/"
+
+    val CONTACTS_OPERATION_FORMAT = HOST + "mediaplatform/api_contacts_operation/%s/"
 }

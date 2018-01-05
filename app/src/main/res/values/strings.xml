@@ -12,4 +12,5 @@
     <string name="remote_contacts_empty_content">您还没有备份通讯录</string>
     <string name="start_backup">开始备份</string>
     <string name="backup">备份</string>
+    <string name="sync_remote">远程同步</string>
 </resources>
