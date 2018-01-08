@@ -1,5 +1,6 @@
 package com.yjp.mediaplatformandroid.tools
 
+import android.content.ContentValues
 import android.content.Context
 import android.provider.ContactsContract
 
@@ -12,7 +13,7 @@ object LocalContactsTools {
                 arrayOf(ContactsContract.Contacts._ID, ContactsContract.PhoneLookup.DISPLAY_NAME),
                 null,
                 null,
-                ContactsContract.PhoneLookup.DISPLAY_NAME)
+                null)
 
         val contacts = mutableMapOf<String, ArrayList<String>>()
 
@@ -42,6 +43,20 @@ object LocalContactsTools {
 
         cursor.close()
         return contacts
+    }
+
+    fun deleteContacts() {
+
+    }
+
+    fun modifyContacts(context: Context, name: String, oldPhoneNumber: String, newPhoneNumber: String) {
+        val cr = context.contentResolver
+        val cv = ContentValues()
+        cv.put(ContactsContract.CommonDataKinds.Phone.NUMBER, newPhoneNumber)
+        cr.update(ContactsContract.Data.CONTENT_URI, cv,
+                ContactsContract.Data.DISPLAY_NAME + "=? and "
+                        + ContactsContract.CommonDataKinds.Phone.NUMBER + "=?",
+                arrayOf(name, oldPhoneNumber))
     }
 
 }

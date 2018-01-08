@@ -11,7 +11,10 @@ import android.widget.Toast
 import com.yjp.mediaplatformandroid.R
 import com.yjp.mediaplatformandroid.communicator.HttpCommunicator
 import com.yjp.mediaplatformandroid.dialogs.WaitDialog
-import com.yjp.mediaplatformandroid.entities.*
+import com.yjp.mediaplatformandroid.entities.RemoteContact
+import com.yjp.mediaplatformandroid.entities.RemoteContactOperationResponse
+import com.yjp.mediaplatformandroid.entities.RemoteContactQueryResponse
+import com.yjp.mediaplatformandroid.entities.RemoteContactUpdateResponse
 import com.yjp.mediaplatformandroid.global.MyApplication
 import com.yjp.mediaplatformandroid.global.URLTable
 import com.yjp.mediaplatformandroid.tools.LocalContactsTools
@@ -20,6 +23,7 @@ import org.greenrobot.eventbus.EventBus
 import org.greenrobot.eventbus.Subscribe
 import org.greenrobot.eventbus.ThreadMode
 import java.lang.RuntimeException
+import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 
 class RemoteContactsActivity : AppCompatActivity() {
@@ -30,7 +34,7 @@ class RemoteContactsActivity : AppCompatActivity() {
     private var communicator: HttpCommunicator? = null
     private var phoneNumberMap = mutableMapOf<String, ArrayList<String>>()
 
-    private val executorService = Executors.newSingleThreadExecutor()
+    private var executorService: ExecutorService? = null
 
     private val dataQueryUrl =
             URLTable.CONTACTS_USER_DETAILS_FORMAT.format(MyApplication.loginFormResponse!!.id)
@@ -73,13 +77,16 @@ class RemoteContactsActivity : AppCompatActivity() {
         super.onStart()
         EventBus.getDefault().register(this)
 
+        executorService = Executors.newSingleThreadExecutor()
         loadData()
     }
 
     override fun onStop() {
         super.onStop()
         EventBus.getDefault().unregister(this)
-        executorService.shutdownNow()
+
+        executorService!!.shutdownNow()
+        executorService = null
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
@@ -136,7 +143,7 @@ class RemoteContactsActivity : AppCompatActivity() {
 
     private fun uploadData() {
         WaitDialog.showWaitDialog(this, "正在备份")
-        executorService.execute(QueryContactsRunnable())
+        executorService!!.execute(QueryContactsRunnable())
     }
 
     private fun syncContacts() {
@@ -150,65 +157,90 @@ class RemoteContactsActivity : AppCompatActivity() {
         communicator!!.postAsync(URLTable.CONTACTS_UPDATE, json, HttpCommunicator.MEDIA_TYPE_JSON)
     }
 
-    @Subscribe(threadMode = ThreadMode.MAIN)
+    @Subscribe(threadMode = ThreadMode.MAIN_ORDERED)
     fun contactsOperationGetComplete(event: HttpCommunicator.HttpEvent) {
-        WaitDialog.dismissWaitDialog()
-
         if (contactsOperationUrl != event.url) {
+            WaitDialog.dismissWaitDialog()
             return
         }
 
         if (!event.success) {
+            WaitDialog.dismissWaitDialog()
             Toast.makeText(this, "同步失败", Toast.LENGTH_SHORT).show()
             return
         }
 
         val response = MyApplication.GSON.fromJson(event.data, RemoteContactOperationResponse::class.java)
         if (!response.error.isEmpty()) {
+            WaitDialog.dismissWaitDialog()
             Toast.makeText(this, response.error, Toast.LENGTH_SHORT).show()
             return
         }
 
+        if (!response.data.isEmpty()) {
+            response.data.forEach {
+                when (it.operation) {
+                    "delete" -> LocalContactsTools.deleteContacts()
+                    "modify" -> LocalContactsTools.modifyContacts(this,
+                            it.contacts.name, it.contacts.phoneNumber, it.newPhoneNumber)
+                    else -> throw RuntimeException("Should not come here.")
+                }
+            }
 
+            WaitDialog.dismissWaitDialog()
+
+            AlertDialog.Builder(this)
+                    .setTitle("提示")
+                    .setMessage("修改完成，需要重新备份通讯录")
+                    .setCancelable(false)
+                    .setPositiveButton("确定") {
+                        _, _ ->
+                        uploadData()
+                    }
+                    .show()
+        }
     }
 
-    @Subscribe(threadMode = ThreadMode.MAIN)
+    @Subscribe(threadMode = ThreadMode.MAIN_ORDERED)
     fun backupComplete(event: HttpCommunicator.HttpEvent) {
-        WaitDialog.dismissWaitDialog()
-
         if (URLTable.CONTACTS_UPDATE != event.url) {
+            WaitDialog.dismissWaitDialog()
             return
         }
 
         if (!event.success) {
+            WaitDialog.dismissWaitDialog()
             Toast.makeText(this, "备份失败", Toast.LENGTH_SHORT).show()
             return
         }
 
         val response = MyApplication.GSON.fromJson(event.data, RemoteContactUpdateResponse::class.java)
         if (!response.error.isEmpty()) {
+            WaitDialog.dismissWaitDialog()
             Toast.makeText(this, response.error, Toast.LENGTH_SHORT).show()
             return
         }
 
+        WaitDialog.dismissWaitDialog()
         loadData()
     }
 
-    @Subscribe(threadMode = ThreadMode.MAIN)
+    @Subscribe(threadMode = ThreadMode.MAIN_ORDERED)
     fun loadDataComplete(event: HttpCommunicator.HttpEvent) {
-        WaitDialog.dismissWaitDialog()
-
         if (dataQueryUrl != event.url) {
+            WaitDialog.dismissWaitDialog()
             return
         }
 
         if (!event.success) {
+            WaitDialog.dismissWaitDialog()
             Toast.makeText(this, "数据获取失败", Toast.LENGTH_SHORT).show()
             return
         }
 
         val response = MyApplication.GSON.fromJson(event.data, RemoteContactQueryResponse::class.java)
         if (!response.error.isEmpty()) {
+            WaitDialog.dismissWaitDialog()
             Toast.makeText(this, response.error, Toast.LENGTH_SHORT).show()
             return
         } else {
@@ -231,6 +263,7 @@ class RemoteContactsActivity : AppCompatActivity() {
             }
 
             mAdapter!!.notifyDataSetChanged()
+            WaitDialog.dismissWaitDialog()
         }
     }
 

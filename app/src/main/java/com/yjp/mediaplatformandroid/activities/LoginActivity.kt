@@ -58,24 +58,27 @@ class LoginActivity : AppCompatActivity() {
         communicator!!.postAsync(URLTable.LOGIN, jsonLoginForm, HttpCommunicator.MEDIA_TYPE_JSON)
     }
 
-    @Subscribe(threadMode = ThreadMode.MAIN)
+    @Subscribe(threadMode = ThreadMode.MAIN_ORDERED)
     fun loginComplete(event: HttpCommunicator.HttpEvent) {
-        WaitDialog.dismissWaitDialog()
-
         if (URLTable.LOGIN != event.url) {
+            WaitDialog.dismissWaitDialog()
             return
         }
 
         if (!event.success) {
+            WaitDialog.dismissWaitDialog()
             Toast.makeText(this, event.data, Toast.LENGTH_SHORT).show()
             return
         }
 
         val loginFormResponse = MyApplication.GSON.fromJson(event.data, LoginFormResponse::class.java)
         if (!loginFormResponse.error.isEmpty()) {
+            WaitDialog.dismissWaitDialog()
             Toast.makeText(this, loginFormResponse.error, Toast.LENGTH_SHORT).show()
             return
         }
+
+        WaitDialog.dismissWaitDialog()
 
         MyApplication.loginFormResponse = loginFormResponse
         val intent = Intent(this, HomeActivity::class.java)

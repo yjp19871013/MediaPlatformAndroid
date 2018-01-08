@@ -64,7 +64,7 @@ class HomeActivity : AppCompatActivity() {
         }
     }
 
-    @Subscribe(threadMode = ThreadMode.MAIN)
+    @Subscribe(threadMode = ThreadMode.MAIN_ORDERED)
     fun onHomeItemClicked(event: HomeAdapter.ItemClicked) {
         val title = event.title
         val cls = ITEM_ACTIVITY_MAP.get(title)
