@@ -76,6 +76,14 @@ object LocalContactsTools {
             // A new contact
             val rawContactUri = cr.insert(ContactsContract.RawContacts.CONTENT_URI, ContentValues())
             val contactId = ContentUris.parseId(rawContactUri).toString()
+
+            val cv = ContentValues()
+            cv.put(ContactsContract.Data.RAW_CONTACT_ID, contactId)
+            cv.put(ContactsContract.Data.MIMETYPE,
+                    ContactsContract.CommonDataKinds.StructuredName.CONTENT_ITEM_TYPE)
+            cv.put(ContactsContract.CommonDataKinds.StructuredName.DISPLAY_NAME, name)
+            cr.insert(ContactsContract.Data.CONTENT_URI, cv)
+
             insertPhoneNumber(cr, contactId, phoneNumber)
         } else {
             // An exist contact
