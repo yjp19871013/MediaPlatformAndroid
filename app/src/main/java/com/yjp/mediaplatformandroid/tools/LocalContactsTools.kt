@@ -1,5 +1,7 @@
 package com.yjp.mediaplatformandroid.tools
 
+import android.content.ContentResolver
+import android.content.ContentUris
 import android.content.ContentValues
 import android.content.Context
 import android.provider.ContactsContract
@@ -62,4 +64,48 @@ object LocalContactsTools {
                 arrayOf(name, oldPhoneNumber))
     }
 
+    fun addPhoneNumber(context: Context, name: String, phoneNumber: String) {
+        val cr = context.contentResolver
+        val cursor = cr.query(ContactsContract.Contacts.CONTENT_URI,
+                arrayOf(ContactsContract.Contacts._ID),
+                ContactsContract.Data.DISPLAY_NAME + "=?",
+                arrayOf(name),
+                null)
+
+        if (cursor.count == 0) {
+            // A new contact
+            val rawContactUri = cr.insert(ContactsContract.RawContacts.CONTENT_URI, ContentValues())
+            val contactId = ContentUris.parseId(rawContactUri).toString()
+            insertPhoneNumber(cr, contactId, phoneNumber)
+        } else {
+            // An exist contact
+            while (cursor.moveToNext()) {
+                val contactId = cursor.getString(cursor.getColumnIndex(ContactsContract.Contacts._ID))
+                val phoneCursor = cr.query(
+                        ContactsContract.CommonDataKinds.Phone.CONTENT_URI,
+                        null,
+                        ContactsContract.CommonDataKinds.Phone.CONTACT_ID + "=? and " +
+                                ContactsContract.CommonDataKinds.Phone.NUMBER + "=?",
+                        arrayOf(contactId, phoneNumber),
+                        null)
+                if (phoneCursor.count == 0) {
+                    insertPhoneNumber(cr, contactId, phoneNumber)
+                }
+
+                phoneCursor.close()
+            }
+        }
+
+        cursor.close()
+    }
+    private fun insertPhoneNumber(cr: ContentResolver, contactId: String, phoneNumber: String) {
+        val cv = ContentValues()
+        cv.put(ContactsContract.Data.RAW_CONTACT_ID, contactId)
+        cv.put(ContactsContract.Data.MIMETYPE,
+                ContactsContract.CommonDataKinds.Phone.CONTENT_ITEM_TYPE)
+        cv.put(ContactsContract.CommonDataKinds.Phone.NUMBER, phoneNumber)
+        cv.put(ContactsContract.CommonDataKinds.Phone.TYPE,
+                ContactsContract.CommonDataKinds.Phone.TYPE_MOBILE)
+        cr.insert(ContactsContract.Data.CONTENT_URI, cv)
+    }
 }

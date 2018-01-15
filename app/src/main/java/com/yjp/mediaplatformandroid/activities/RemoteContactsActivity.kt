@@ -184,6 +184,8 @@ class RemoteContactsActivity : AppCompatActivity() {
                             it.contacts.name, it.contacts.phoneNumber)
                     "modify" -> LocalContactsTools.modifyContacts(this,
                             it.contacts.name, it.contacts.phoneNumber, it.newPhoneNumber)
+                    "add_phone_number" -> LocalContactsTools.addPhoneNumber(this,
+                            it.contacts.name, it.newPhoneNumber)
                     else -> throw RuntimeException("Should not come here.")
                 }
             }
