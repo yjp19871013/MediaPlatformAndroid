@@ -45,8 +45,11 @@ object LocalContactsTools {
         return contacts
     }
 
-    fun deleteContacts() {
-
+    fun deleteContacts(context: Context, name: String, phoneNumber: String) {
+        val cr = context.contentResolver
+        cr.delete(ContactsContract.Data.CONTENT_URI, ContactsContract.Data.DISPLAY_NAME + "=? and "
+                + ContactsContract.CommonDataKinds.Phone.NUMBER + "=?",
+                arrayOf(name, phoneNumber))
     }
 
     fun modifyContacts(context: Context, name: String, oldPhoneNumber: String, newPhoneNumber: String) {

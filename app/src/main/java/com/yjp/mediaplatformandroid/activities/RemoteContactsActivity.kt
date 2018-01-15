@@ -180,7 +180,8 @@ class RemoteContactsActivity : AppCompatActivity() {
         if (!response.data.isEmpty()) {
             response.data.forEach {
                 when (it.operation) {
-                    "delete" -> LocalContactsTools.deleteContacts()
+                    "delete" -> LocalContactsTools.deleteContacts(this,
+                            it.contacts.name, it.contacts.phoneNumber)
                     "modify" -> LocalContactsTools.modifyContacts(this,
                             it.contacts.name, it.contacts.phoneNumber, it.newPhoneNumber)
                     else -> throw RuntimeException("Should not come here.")
